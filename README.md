@@ -71,8 +71,8 @@ graph TB
 
     %% 连接关系
     A -- "TCP长连接 (Protobuf)" --> C
-    B -- "HTTP请求" --> D
     A -- "HTTP/REST API (JSON)" --> D
+    B -- "HTTP请求" --> D
 
     C -- "消息分发" --> E
     D -- "API调用" --> E
