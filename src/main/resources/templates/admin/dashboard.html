@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制台 - 游戏管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5dacdf;
+            --sidebar-bg: #2c3e50;
+            --sidebar-width: 250px;
+            --header-height: 55px;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            transition: none !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #212529;
+            overflow-x: hidden;
+        }
+
+        .main-header {
+            height: var(--header-height);
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1030;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--sidebar-bg);
+            text-transform: uppercase;
+            width: var(--sidebar-width);
+            border-right: 1px solid var(--border-color);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            margin-left: -1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        /* 侧边栏 */
+        .main-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            position: fixed;
+            top: var(--header-height);
+            bottom: 0;
+            left: 0;
+            z-index: 1020;
+            padding-top: 1rem;
+        }
+
+        .nav-link {
+            color: #b8c7ce;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: #fff;
+            background-color: rgba(255,255,255,0.05);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            margin-right: 0.8rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .content-wrapper {
+            margin-top: var(--header-height);
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        /* 统计卡片 */
+        .info-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 顶部色条 */
+        .info-box.border-primary { border-top: 3px solid var(--primary-color) !important; }
+        .info-box.border-success { border-top: 3px solid #28a745 !important; }
+        .info-box.border-warning { border-top: 3px solid #ffc107 !important; }
+        .info-box.border-danger { border-top: 3px solid #dc3545 !important; }
+
+        .info-box-label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6c757d;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #212529;
+            line-height: 1;
+        }
+
+        .info-box-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        /* 普通卡片 */
+        .card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* 表格样式 */
+        .table th {
+            border-top: none;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #4a9bcf;
+            border-color: #4a9bcf;
+        }
+
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* 状态表格网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-item {
+            padding: 1.5rem;
+            text-align: center;
+            border-right: 1px solid var(--border-color);
+            background: #fff;
+        }
+
+        .stats-item:last-child { border-right: none; }
+
+        .stats-num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stats-txt {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<header class="main-header">
+    <div class="brand-text">
+        GAME ADMIN
+    </div>
+    <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center">
+            <a href="/admin/logout" class="btn btn-outline-secondary btn-sm">退出登录</a>
+        </div>
+    </div>
+</header>
+
+<!-- 侧边栏 -->
+<aside class="main-sidebar">
+    <nav class="nav flex-column">
+        <div class="text-white-50 small px-3 mb-2 mt-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Main Menu</div>
+        <a class="nav-link active" href="/admin/dashboard">
+            <i class="bi bi-speedometer2"></i> 控制台
+        </a>
+        <a class="nav-link" href="/admin/users">
+            <i class="bi bi-people"></i> 用户管理
+        </a>
+        <a class="nav-link" href="/admin/battles">
+            <i class="bi bi-list-ul"></i> 历史战斗
+        </a>
+        <a class="nav-link" href="/admin/lua">
+            <i class="bi bi-terminal"></i> Lua 脚本
+        </a>
+    </nav>
+</aside>
+
+<!-- 主内容 -->
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">控制台</h1>
+        <div class="text-muted small">系统运行概览与核心指标监控</div>
+    </div>
+
+    <!-- 顶层数据卡片 -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="info-box border-primary">
+                <div class="info-box-label">Total Users</div>
+                <div class="info-box-number" th:text="${totalUsers}">1,245</div>
+                <div class="info-box-desc">注册用户总数</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-box border-success">
+                <div class="info-box-label">Online</div>
+                <div class="info-box-number text-success" th:text="${onlineUsers}">42</div>
+                <div class="info-box-desc">当前在线人数</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-box border-warning">
+                <div class="info-box-label">Active Battles</div>
+                <div class="info-box-number text-warning" th:text="${activeBattles}">8</div>
+                <div class="info-box-desc">实时进行中</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-box border-danger">
+                <div class="info-box-label">Redis Cache</div>
+                <div class="info-box-number" th:text="${totalReports}">856</div>
+                <div class="info-box-desc">战报缓存数量</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 主数据区 -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <span>MySQL 历史数据概览</span>
+                    <a href="/admin/battles" class="btn btn-sm btn-outline-secondary">查看全部</a>
+                </div>
+                <div class="stats-grid">
+                    <div class="stats-item">
+                        <div class="stats-num" th:text="${totalHistoryBattles != null ? totalHistoryBattles : 0}">0</div>
+                        <div class="stats-txt">总场次</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-num text-success" th:text="${normalEndBattles != null ? normalEndBattles : 0}">0</div>
+                        <div class="stats-txt">正常结束</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-num text-warning" th:text="${surrenderBattles != null ? surrenderBattles : 0}">0</div>
+                        <div class="stats-txt">投降</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-num text-danger" th:text="${abnormalBattles != null ? abnormalBattles : 0}">0</div>
+                        <div class="stats-txt">异常</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-0">
+                        * 数据来源：MySQL 持久化存储。异常结束通常由网络波动或服务重启导致。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 快捷操作区 -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">系统维护</div>
+                        <div class="card-body">
+                            <div class="alert alert-warning rounded-0 mb-3 border-0" style="background: #fff3cd; color: #856404;">
+                                <strong>注意：</strong> 修改数据库配置后需手动刷新。
+                            </div>
+                            <button id="refreshBtn" class="btn btn-primary w-100" onclick="refreshCache()">
+                                刷新系统缓存 (Reload Config)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">快速跳转</div>
+                        <div class="list-group list-group-flush">
+                            <a href="/admin/users" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                用户管理
+                                <span class="badge bg-secondary rounded-0">Manage</span>
+                            </a>
+                            <a href="/admin/lua" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Lua 脚本引擎
+                                <span class="badge bg-secondary rounded-0">Code</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧信息栏 -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    系统信息
+                </div>
+                <table class="table table-sm m-0">
+                    <tbody>
+                    <tr>
+                        <td class="text-muted">版本</td>
+                        <td class="text-end fw-bold">1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">框架</td>
+                        <td class="text-end">Spring Boot 4.0</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">数据库</td>
+                        <td class="text-end">MySQL 9.6</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">缓存</td>
+                        <td class="text-end">Redis 8.0</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Java版本</td>
+                        <td class="text-end">JDK 21</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">服务器时间</td>
+                        <td class="text-end fw-bold" th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function refreshCache() {
+        const btn = document.getElementById('refreshBtn');
+        const originalText = btn.innerText;
+
+        if(!confirm('CONFIRM: Refresh all system caches?')) return;
+
+        btn.disabled = true;
+        btn.innerText = 'PROCESSING...';
+
+        fetch('/admin/system/refresh', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    alert('SUCCESS: ' + data.message);
+                } else {
+                    alert('ERROR: ' + data.message);
+                }
+            })
+            .catch(err => alert('NETWORK ERROR: ' + err))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            });
+    }
+</script>
+</body>
+</html>

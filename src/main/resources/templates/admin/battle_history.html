@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史战斗 - 游戏管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5dacdf;
+            --sidebar-bg: #2c3e50;
+            --sidebar-width: 250px;
+            --header-height: 55px;
+            --border-color: #dee2e6;
+        }
+
+        /* 全局圆角、阴影设置 */
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            transition: none !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #212529;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .main-header {
+            height: var(--header-height);
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1030;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--sidebar-bg);
+            text-transform: uppercase;
+            width: var(--sidebar-width);
+            border-right: 1px solid var(--border-color);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            margin-left: -1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        /* 侧边栏 */
+        .main-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            position: fixed;
+            top: var(--header-height);
+            bottom: 0;
+            left: 0;
+            z-index: 1020;
+            padding-top: 1rem;
+        }
+
+        .nav-link {
+            color: #b8c7ce;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: #fff;
+            background-color: rgba(255,255,255,0.05);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            margin-right: 0.8rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .content-wrapper {
+            margin-top: var(--header-height);
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        /* Tab 样式重写 */
+        .nav-tabs {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: 1px solid transparent;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            margin-right: 2px;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: #e9ecef #e9ecef #dee2e6;
+            color: var(--sidebar-bg);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #212529;
+            background-color: #f4f6f9;
+            border-color: var(--border-color) var(--border-color) #f4f6f9;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        /* 筛选栏 */
+        .filter-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 表格样式 */
+        .table {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: #495057;
+            vertical-align: middle;
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* 分页 */
+        .pagination { margin-top: 1rem; margin-bottom: 0; }
+        .page-link { color: #212529; border-color: var(--border-color); }
+        .page-link:hover { background-color: #e9ecef; color: #212529; }
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+        .page-item.disabled .page-link { background-color: #f8f9fa; color: #6c757d; }
+
+        /* 模态框 */
+        .modal-content { border: 1px solid #999; }
+        .modal-header { background: #f8f9fa; border-bottom: 1px solid var(--border-color); padding: 1rem; }
+        .modal-title { font-weight: 600; font-size: 1.1rem; }
+        .modal-footer { background: #f8f9fa; border-top: 1px solid var(--border-color); padding: 0.75rem; }
+
+        /* 徽章 */
+        .badge { font-weight: 500; padding: 0.35em 0.65em; }
+    </style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<header class="main-header">
+    <div class="brand-text">GAME ADMIN</div>
+    <div class="d-flex align-items-center">
+        <a href="/admin/logout" class="btn btn-outline-secondary btn-sm">退出登录</a>
+    </div>
+</header>
+
+<!-- 侧边栏 -->
+<aside class="main-sidebar">
+    <nav class="nav flex-column">
+        <div class="text-white-50 small px-3 mb-2 mt-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Main Menu</div>
+        <a class="nav-link" href="/admin/dashboard">
+            <i class="bi bi-speedometer2"></i> 控制台
+        </a>
+        <a class="nav-link" href="/admin/users">
+            <i class="bi bi-people"></i> 用户管理
+        </a>
+        <a class="nav-link active" href="/admin/battles">
+            <i class="bi bi-list-ul"></i> 历史战斗
+        </a>
+        <a class="nav-link" href="/admin/lua">
+            <i class="bi bi-terminal"></i> Lua 脚本
+        </a>
+    </nav>
+</aside>
+
+<!-- 主内容 -->
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">历史战斗记录</h1>
+        <div class="text-muted small">查询与回放所有对战数据 (MySQL / Redis)</div>
+    </div>
+
+    <!-- Tab导航 -->
+    <ul class="nav nav-tabs" id="battleTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="mysql-tab" data-bs-toggle="tab" data-bs-target="#mysql-panel" type="button">
+                MySQL 归档记录
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="redis-tab" data-bs-toggle="tab" data-bs-target="#redis-panel" type="button">
+                Redis 临时战报 (7天)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- MySQL 面板 -->
+        <div class="tab-pane fade show active" id="mysql-panel">
+
+            <!-- 筛选工具栏 -->
+            <div class="filter-box">
+                <form method="get" action="/admin/battles" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-1">玩家 ID</label>
+                        <input type="number" class="form-control form-control-sm" name="userId" th:value="${filterUserId}" placeholder="例如: 1001">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-1">结束原因</label>
+                        <select class="form-select form-select-sm" name="endReason">
+                            <option value="">-- 全部 --</option>
+                            <option value="NORMAL" th:selected="${filterEndReason == 'NORMAL'}">正常结束</option>
+                            <option value="SURRENDER" th:selected="${filterEndReason == 'SURRENDER'}">投降</option>
+                            <option value="TIMEOUT" th:selected="${filterEndReason == 'TIMEOUT'}">超时</option>
+                            <option value="DISCONNECT" th:selected="${filterEndReason == 'DISCONNECT'}">断线</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-funnel-fill me-1"></i> 应用筛选
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/battles" class="btn btn-outline-secondary btn-sm w-100">重置</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="alert alert-info border-info text-info small py-2" th:if="${filterUserId != null}">
+                <i class="bi bi-info-circle me-1"></i> 当前筛选: 玩家 <strong>[[${filterUserNickname}]]</strong> (ID: [[${filterUserId}]])
+            </div>
+
+            <!-- MySQL 数据表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="width: 220px;">战斗 ID</th>
+                        <th>玩家 1 (发起方)</th>
+                        <th>玩家 2 (接收方)</th>
+                        <th>获胜者</th>
+                        <th class="text-center">回合</th>
+                        <th class="text-center">状态</th>
+                        <th style="width: 160px;">
+                            <a th:href="@{/admin/battles(sort='createdAt', dir=${sortDir == 'asc' ? 'desc' : 'asc'}, userId=${filterUserId}, endReason=${filterEndReason})}"
+                               class="text-decoration-none text-dark">
+                                时间 <i class="bi" th:classappend="${sortField == 'createdAt'} ? (${sortDir == 'asc'} ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                            </a>
+                        </th>
+                        <th style="width: 100px;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="battle : ${battles}">
+                        <td>
+                            <code class="text-muted"
+                                  th:title="${battle.battleId}"
+                                  th:text="${#strings.length(battle.battleId) > 21 ? #strings.substring(battle.battleId, 0, 21) + '...' : battle.battleId}">
+                            </code>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/users/{id}(id=${battle.player1Id})}" th:text="${battle.player1Nickname}" class="text-decoration-none fw-bold text-dark"></a>
+                            <div class="small text-muted">
+                                ELO: <span th:text="${battle.player1EloBefore}"></span> <i class="bi bi-arrow-right-short"></i>
+                                <span th:text="${battle.player1EloAfter}" th:class="${battle.player1EloAfter > battle.player1EloBefore ? 'text-success' : 'text-danger'}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/users/{id}(id=${battle.player2Id})}" th:text="${battle.player2Nickname}" class="text-decoration-none fw-bold text-dark"></a>
+                            <div class="small text-muted">
+                                ELO: <span th:text="${battle.player2EloBefore}"></span> <i class="bi bi-arrow-right-short"></i>
+                                <span th:text="${battle.player2EloAfter}" th:class="${battle.player2EloAfter > battle.player2EloBefore ? 'text-success' : 'text-danger'}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <span th:if="${battle.winnerId == battle.player1Id}" class="badge bg-success" th:text="${battle.player1Nickname}"></span>
+                            <span th:if="${battle.winnerId == battle.player2Id}" class="badge bg-success" th:text="${battle.player2Nickname}"></span>
+                            <span th:if="${battle.winnerId == null}" class="badge bg-secondary">平局/无效</span>
+                        </td>
+                        <td class="text-center" th:text="${battle.totalRounds}">0</td>
+                        <td class="text-center">
+                            <span th:switch="${battle.endReason}">
+                                <span th:case="'NORMAL'" class="badge bg-success">正常</span>
+                                <span th:case="'SURRENDER'" class="badge bg-warning text-dark">投降</span>
+                                <span th:case="'TIMEOUT'" class="badge bg-danger">超时</span>
+                                <span th:case="'DISCONNECT'" class="badge bg-secondary">断线</span>
+                            </span>
+                        </td>
+                        <td class="small text-muted" th:text="${#temporals.format(battle.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm view-mysql-battle" th:attr="data-battle-id=${battle.battleId}">
+                                详情
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div th:if="${#lists.isEmpty(battles)}" class="p-5 text-center bg-white border border-top-0 text-muted">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-2 mb-0">没有找到相关记录</p>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="d-flex justify-content-between align-items-center mt-3" th:if="${totalPages > 0}">
+                <div class="small text-muted">
+                    显示第 <strong th:text="${currentPage + 1}">1</strong> 页 / 共 <strong th:text="${totalPages}">1</strong> 页
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/battles(page=${currentPage - 1}, userId=${filterUserId}, endReason=${filterEndReason})}">上一页</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/battles(page=${currentPage + 1}, userId=${filterUserId}, endReason=${filterEndReason})}">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Redis 面板 -->
+        <div class="tab-pane fade" id="redis-panel">
+            <div class="alert alert-light border small text-muted mb-3">
+                <i class="bi bi-hdd-network me-2"></i>Redis 战报包含战斗过程中的完整快照数据，有效期 7 天。过期后请查阅 MySQL 归档。
+            </div>
+
+            <div class="list-group">
+                <div th:if="${reportKeys != null and !#lists.isEmpty(reportKeys)}" th:each="key : ${reportKeys}"
+                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+                        <span class="font-monospace" th:text="${key}">battle:report:123...</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-light border view-redis-report me-1"
+                                th:attr="data-battle-id=${#strings.replace(key, 'battle:report:', '')}">
+                            <i class="bi bi-eye"></i> 解析
+                        </button>
+                        <a th:href="@{/api/battle/report/{id}(id=${#strings.replace(key, 'battle:report:', '')})}"
+                           class="btn btn-sm btn-light border" target="_blank">
+                            <i class="bi bi-code"></i> JSON
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${reportKeys == null or #lists.isEmpty(reportKeys)}" class="list-group-item text-center py-5 text-muted">
+                    当前 Redis 中没有缓存的战报数据
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 详情模态框 -->
+<div class="modal fade" id="battleDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">战斗回放日志</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="battleDetailContent">
+                    <!-- JS 动态加载内容 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('battleDetailModal'));
+        const contentDiv = document.getElementById('battleDetailContent');
+
+        // 事件委托处理点击
+        document.body.addEventListener('click', function(e) {
+            // MySQL 详情
+            const mysqlBtn = e.target.closest('.view-mysql-battle');
+            if (mysqlBtn) {
+                loadDetail(modal, contentDiv, '/admin/battle/' + mysqlBtn.dataset.battleId + '/detail', 'mysql');
+            }
+
+            // Redis 详情
+            const redisBtn = e.target.closest('.view-redis-report');
+            if (redisBtn) {
+                loadDetail(modal, contentDiv, '/api/battle/report/' + redisBtn.dataset.battleId, 'redis');
+            }
+        });
+    });
+
+    function loadDetail(modal, contentDiv, url, type) {
+        contentDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><div class="mt-2 small text-muted">正在加载数据...</div></div>';
+        modal.show();
+
+        fetch(url)
+            .then(res => res.json())
+            .then(json => {
+                let data = json;
+                if (type === 'redis') {
+                    data = json.data || json;  // 优先使用data字段，没有则直接使用json
+                }
+
+                if (!data || (type === 'redis' && (!data.player1 || !data.player2))) {
+                    renderError(contentDiv, '数据为空或格式不正确');
+                    return;
+                }
+
+                if (type === 'redis') {
+                    renderRedis(contentDiv, data);
+                } else {
+                    renderMysql(contentDiv, data);
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                renderError(contentDiv, '加载失败: ' + err.message);
+            });
+    }
+
+    function renderError(div, msg) {
+        div.innerHTML = `<div class="alert alert-danger m-3 rounded-0">${msg}</div>`;
+    }
+
+    // 渲染 MySQL 归档数据
+    function renderMysql(div, data) {
+        let logs = [];
+        try { logs = JSON.parse(data.battleLogJson); } catch(e) {}
+
+        let html = `
+            <div class="bg-light p-3 border-bottom">
+                <div class="row g-2 small">
+                    <div class="col-md-3"><strong>ID:</strong> <code class="text-dark">${data.battleId}</code></div>
+                    <div class="col-md-3"><strong>结束原因:</strong> ${data.endReason}</div>
+                    <div class="col-md-3"><strong>回合数:</strong> ${data.totalRounds}</div>
+                    <div class="col-md-3"><strong>胜者ID:</strong> ${data.winnerId || '无'}</div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0 small">
+                    <thead class="bg-white">
+                        <tr>
+                            <th style="width:50px">Rnd</th>
+                            <th>行动者</th>
+                            <th>技能</th>
+                            <th>数值</th>
+                            <th>目标</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        logs.forEach(log => {
+            html += `
+                <tr>
+                    <td class="text-center text-muted">${log.round}</td>
+                    <td class="fw-bold">${log.actorNickname}</td>
+                    <td><span class="badge bg-secondary text-light fw-normal">${log.skillName || '-'}</span></td>
+                    <td>
+                        ${log.damage ? '<span class="text-danger fw-bold">-' + log.damage + '</span>' : ''}
+                        ${log.heal ? '<span class="text-success fw-bold">+' + log.heal + '</span>' : ''}
+                    </td>
+                    <td>${log.targetNickname || '-'}</td>
+                    <td class="text-muted">${log.description}</td>
+                </tr>`;
+        });
+        html += '</tbody></table></div>';
+        div.innerHTML = html;
+    }
+
+    // 渲染 Redis 实时数据
+    function renderRedis(div, data) {
+        let html = `
+            <div class="bg-light p-3 border-bottom">
+                <div class="row g-2 small">
+                    <div class="col-md-6">
+                        <div><strong>玩家 1:</strong> ${data.player1.nickname} (HP: ${data.player1.currentHp}/${data.player1.maxHp})</div>
+                        <div><strong>玩家 2:</strong> ${data.player2.nickname} (HP: ${data.player2.currentHp}/${data.player2.maxHp})</div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div><strong>状态:</strong> ${data.state}</div>
+                        <div><strong>当前回合:</strong> ${data.currentRound}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0 small">
+                    <thead class="bg-white">
+                        <tr>
+                            <th style="width:50px">Rnd</th>
+                            <th>行动者</th>
+                            <th>技能</th>
+                            <th>数值</th>
+                            <th>目标</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        if(data.logs && data.logs.length > 0) {
+            data.logs.forEach(log => {
+                html += `
+                    <tr>
+                        <td class="text-center text-muted">${log.round}</td>
+                        <td class="fw-bold">${log.actorNickname}</td>
+                        <td><span class="badge bg-info text-dark fw-normal">${log.skillName || '-'}</span></td>
+                        <td>
+                            ${log.damage ? '<span class="text-danger fw-bold">-' + log.damage + '</span>' : ''}
+                            ${log.heal ? '<span class="text-success fw-bold">+' + log.heal + '</span>' : ''}
+                        </td>
+                        <td>${log.targetNickname || '-'}</td>
+                        <td class="text-muted">${log.description}</td>
+                    </tr>`;
+            });
+        } else {
+            html += '<tr><td colspan="6" class="text-center py-3">暂无战斗日志</td></tr>';
+        }
+
+        html += '</tbody></table></div>';
+        div.innerHTML = html;
+    }
+</script>
+</body>
+</html>

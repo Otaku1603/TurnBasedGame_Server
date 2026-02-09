@@ -1,0 +1,84 @@
+### 编译输出与依赖 ###
+# Java 编译类文件
+*.class
+
+# Maven 目标目录
+target/
+# 排除 src/main 和 src/test 下的 target 目录（通常需要保留）
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# 构建目录 (如 Gradle)
+build/
+# 排除 src/main 和 src/test 下的 build 目录
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# 包文件
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+### 日志文件 ###
+*.log
+hs_err_pid*
+replay_pid*
+
+### 开发环境与IDE ###
+# VS Code
+.vscode/
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Eclipse & STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# 其他通用IDE/编辑器文件
+*.ctxt
+.mtj.tmp/
+
+### Maven 特定文件 ###
+.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+### 项目文档 ###
+HELP.md
+
+### Python 脚本 ###
+*.py
+
+### 安全证书/私钥 ###
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+.env*

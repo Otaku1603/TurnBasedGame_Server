@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # --- 数据库 ---
+  mysql:
+    image: mysql:latest
+    container_name: game-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 7355608
+      MYSQL_DATABASE: turn_based_game
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      # 数据持久化（防止重启丢数据）
+      - mysql_data:/var/lib/mysql
+      # 【自动化】挂载 SQL 脚本，容器首次启动会自动执行
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Redis ---
+  redis:
+    image: redis:latest
+    container_name: game-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  # --- 游戏后端 ---
+  game-server:
+    build: .
+    container_name: game-server
+    restart: always
+    # ports:
+    #   - "8080:8080"
+    #   - "9999:9999"
+    environment:
+      # 告诉 Java 代码，Lua 脚本的真实路径在哪里
+      # 对应 Java 代码中的 @Value("${battle.lua-script-path}")
+      - GAME_LUA_SCRIPT_PATH=/app/lua_scripts/damage_formulas.lua
+
+      # 数据库连接等其他配置...
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/turn_based_game?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_PASSWORD=7355608
+      - SPRING_DATA_REDIS_HOST=redis
+      - TZ=Asia/Shanghai
+    volumes:
+      # 左边：Linux 宿主机的目录 (会自动创建)
+      # 右边：容器内的运行目录
+      # 启动时，entrypoint.sh 会把文件复制到这里，你就能在 Linux 看到它了
+      - ./lua_data:/app/lua_scripts
+
+      - ./logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # --- 反向代理网关 ---
+  gateway:
+    image: nginx:latest
+    container_name: game-gateway
+    restart: always
+    ports:
+      - "443:443"   # HTTPS 接口
+      - "9999:9999" # SSL TCP 接口
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./cert:/etc/nginx/cert
+    depends_on:
+      - game-server
+
+volumes:
+  mysql_data:
+  redis_data:

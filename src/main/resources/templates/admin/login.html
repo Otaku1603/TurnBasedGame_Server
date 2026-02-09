@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统登录 - 游戏管理后台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5dacdf;
+            --dark-color: #2c3e50;
+            --border-color: #dee2e6;
+        }
+
+        /* 全局圆角、阴影设置 */
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            transition: none !important;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .login-header {
+            padding: 2rem 2rem 1rem;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .login-header h3 {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .login-header small {
+            color: #6c757d;
+            font-size: 0.875rem;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .form-control:focus {
+            background-color: #fff;
+            border-color: var(--primary-color);
+            color: #495057;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login {
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            color: #fff;
+            padding: 0.75rem;
+            font-weight: 600;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-login:hover {
+            background-color: #4a9bcf;
+            border-color: #4a9bcf;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            font-size: 0.875rem;
+            padding: 0.75rem;
+        }
+
+        .login-footer {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="login-header">
+        <h3>ADMIN PORTAL</h3>
+        <small>管理控制台</small>
+    </div>
+
+    <div class="login-body">
+        <div th:if="${error}" class="alert alert-danger">
+            <strong>错误：</strong> <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/admin/login}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" name="username" required autofocus>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-login">登录</button>
+        </form>
+    </div>
+
+    <div class="login-footer">
+        <span>系统状态: <span style="color: #28a745; font-weight: bold;">● 在线</span></span>
+        <span>默认用户名/密码: admin / 123456</span>
+    </div>
+</div>
+
+</body>
+</html>
