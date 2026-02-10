@@ -2,6 +2,9 @@
 # Java 编译类文件
 *.class
 
+# Protobuf 自动生成类
+src/main/java/com/game/fwork/proto/*
+
 # Maven 目标目录
 target/
 # 排除 src/main 和 src/test 下的 target 目录（通常需要保留）

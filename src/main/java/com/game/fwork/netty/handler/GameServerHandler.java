@@ -101,8 +101,8 @@ public class GameServerHandler extends SimpleChannelInboundHandler<GameMessage> 
                 logger.info("玩家重连，清除断线标记: userId={}", userId);
             }
 
-            logger.info("玩家登录成功: userId={}, username={}",
-                    userId, user.getUsername());
+            logger.info("玩家登录成功: userId={}, username={}, IP={}",
+                    userId, user.getUsername(), ctx.channel().remoteAddress());
 
             LoginResponse response = LoginResponse.newBuilder()
                     .setSuccess(true)

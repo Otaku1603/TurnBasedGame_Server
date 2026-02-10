@@ -118,6 +118,7 @@ public class NettyServer {
                 logger.info("========================================");
                 logger.info("Netty服务器启动成功！");
                 logger.info("监听端口: {}", port);
+                logger.info("代理 Protocol: {}", useProxyProtocol ? "启用 (Nginx/HAProxy)" : "禁用 (直接连接)");
                 logger.info("Boss线程数: {}", bossThreads);
                 logger.info("Worker线程数: {}", workerThreads);
                 logger.info("心跳超时: {}秒", readerIdleTime);

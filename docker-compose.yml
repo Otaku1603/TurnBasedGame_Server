@@ -70,7 +70,7 @@ services:
   # --- 反向代理网关 ---
   gateway:
     build: ./nginx  # 指向包含 Dockerfile 的目录
-    container_name: game-gateway
+    container_name: game-nginx-gateway
     restart: always
     ports:
       - "443:443"   # HTTPS 接口

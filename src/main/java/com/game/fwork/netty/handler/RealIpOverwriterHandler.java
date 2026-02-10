@@ -43,7 +43,7 @@ public class RealIpOverwriterHandler extends SimpleChannelInboundHandler<HAProxy
                 // 2. 替换 Channel 内部的地址
                 if (remoteAddressField != null) {
                     remoteAddressField.set(ctx.channel(), realAddress);
-                    logger.debug("IP 劫持成功: {} -> {}", ctx.channel().remoteAddress(), realAddress);
+                    logger.debug("IP 劫持成功: Nginx[{}] -> 真实IP[{}]", ctx.channel().remoteAddress(), realAddress);
                 }
             } catch (Exception e) {
                 logger.warn("设置真实IP失败", e);
