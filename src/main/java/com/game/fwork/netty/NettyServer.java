@@ -1,17 +1,21 @@
 package com.game.fwork.netty;
 
 import com.game.fwork.netty.handler.GameServerHandler;
+import com.game.fwork.netty.handler.RealIpOverwriterHandler;
 import com.game.fwork.proto.GameProto;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.haproxy.HAProxyMessage;
+import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +46,13 @@ public class NettyServer {
     @Value("${netty.server.worker-threads:4}")
     private int workerThreads;
 
-    @Value("${netty.server.heartbeat.reader-idle:60}")
+    @Value("${netty.server.heartbeat.reader-idle:10}")
     private int readerIdleTime;
+
+    @Value("${netty.server.use-proxy-protocol:true}")
+    private boolean useProxyProtocol;
+
+    public static final AttributeKey<String> REAL_IP_KEY = AttributeKey.valueOf("REAL_IP");
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -72,6 +81,15 @@ public class NettyServer {
                             @Override
                             protected void initChannel(SocketChannel ch) throws Exception {
                                 ChannelPipeline pipeline = ch.pipeline();
+
+                                // 如果开启了代理模式，先解码 PROXY 协议头
+                                if (useProxyProtocol) {
+                                    // 官方解码器：把二进制头变成 Java 对象
+                                    pipeline.addLast(new HAProxyMessageDecoder());
+
+                                    // 我们的劫持处理器：把 Java 对象里的 IP 强行塞给 Channel
+                                    pipeline.addLast(new RealIpOverwriterHandler());
+                                }
 
                                 // 心跳检测（一定时间内无读操作触发IdleStateEvent）
                                 pipeline.addLast(new IdleStateHandler(

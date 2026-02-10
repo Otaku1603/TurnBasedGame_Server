@@ -1,8 +1,8 @@
 # TurnBasedGame-Server
 
-本项目是一个基于 **SpringBoot 4.0.1** 和 **Netty** 构建的高性能、可扩展的回合制游戏服务端。它采用现代化的后端技术栈和清晰的分层架构，旨在为游戏提供稳定、低延迟的核心业务支持，并为开发者提供一份结构清晰、易于维护和二次开发的样板工程。
+本项目是一个基于 **SpringBoot 4.0.1** 和 **Netty** 构建的高性能、可扩展的回合制在线游戏服务端。它采用现代化的后端技术栈和清晰的分层架构，旨在为游戏提供稳定、低延迟的核心业务支持，并为开发者提供一份结构清晰、易于维护和二次开发的样板工程。
 
-该项目不仅实现了游戏的核心功能，也包含了完整的后台管理系统，使其成为一份适用于**毕业设计**、**技术研究**和**实际项目开发**的综合性解决方案。
+该项目不仅实现了游戏的核心功能，也包含了完整的后台管理系统。
 
 ## 核心特性
 
@@ -342,17 +342,20 @@ erDiagram
 ### A2. 运行
 
 1.  **初始化数据库**:
-    -   首次运行时，你可以配置 `spring.jpa.hibernate.ddl-auto=update`（默认是`validate`），JPA/Hibernate会自动根据`@Entity`类创建所有数据表。
+    -   首次运行时，你可以配置 `spring.jpa.hibernate.ddl-auto=update`（默认为 `validate` ），JPA/Hibernate会自动根据`@Entity`类创建所有数据表。
     -   为了填充初始数据（如管理员账号、技能模板等），请手动执行项目根目录下的 `init.sql` 脚本，建议在首次执行项目前先执行SQL脚本。
 
-2.  **启动应用**:
+2.  **关闭Netty PROXY Protocol 解码**:
+    -   打开 `application.properties` 后将 `netty.server.use-proxy-protocol` 切换为 `false`（默认为 `true` ）。 
+
+3.  **启动应用**:
     -   **通过IDE**: 直接运行 `GameApplication.java` 的 `main` 方法。
     -   **通过Maven**: 在项目根目录下执行命令：
         ```bash
         mvn spring-boot:run
         ```
 
-3.  **验证**:
+4.  **验证**:
     -   **HTTP服务**: 浏览器访问 `http://localhost:8080/admin`，应能看到后台登录页面。
     -   **Netty服务**: 服务端控制台会打印 `Netty服务器启动成功！监听端口: 9999`。此时，如果游戏客户端启用了HTTP连接，便可以连接到 `localhost:9999`。
 
@@ -366,11 +369,13 @@ erDiagram
 
 2.  **配置Docker Compose文件**:
 -   **自定义（可选）**: 可以按需修改字段（如修改 `SPRING_DATASOURCE_PASSWORD` 来更改访问数据库所使用的密码）或增减将要部署的容器（如注释部署MySQL容器的部分，选择使用自己的数据库容器）
--   **安全性（生产环境下必须完成）**: 修改JWT密钥：
-    ```properties
-    # 生成一个复杂的随机字符串替换默认值
-    JWT_SECRET=your-super-secret-key-that-is-long-and-random
-    ```
+-   **安全性（生产环境下必须完成）**: 
+  - 修改JWT密钥：
+      ```properties
+      # 生成一个复杂的随机字符串替换默认值
+      JWT_SECRET=your-super-secret-key-that-is-long-and-random
+      ```
+    
 
 3.  **编译、封装、运行**:
 -   **执行Docker Compose**: 在项目根目录下执行命令实现自动化部署：

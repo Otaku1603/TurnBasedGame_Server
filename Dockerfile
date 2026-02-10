@@ -47,4 +47,4 @@ EXPOSE 8080 9999
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # 6. 默认命令启动 Java
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "--add-opens", "java.base/java.net=ALL-UNNAMED", "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED", "-jar", "app.jar"]
