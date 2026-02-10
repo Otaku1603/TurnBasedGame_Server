@@ -294,11 +294,9 @@ erDiagram
     }
 
     t_user ||--o{ t_character : "拥有"
-    t_user ||--o{ t_battle_record : "作为玩家1"
-    t_user ||--o{ t_battle_record : "作为玩家2"
-    t_user ||--o{ t_battle_record : "作为胜者"
-    t_user ||--o{ t_friend : "拥有好友"
-    t_user ||--o{ t_user_inventory : "拥有物品"
+    t_user ||--o{ t_battle_record : "拥有"
+    t_user ||--o{ t_friend : "拥有"
+    t_user ||--o{ t_user_inventory : "拥有"
     t_item ||--o{ t_user_inventory : "被拥有"
 ```
 
@@ -362,10 +360,7 @@ erDiagram
 ### B. 编译与部署（使用Docker，且使用SSL通讯）
 
 1.  **SSL配置**:
--   **生成证书**: 将私钥与证书命名为server.*（文件扩展名）后在项目根目录创建 `cert` 文件夹，并将文件放入其中，没有私钥可选择从提供商（如`Let's Encrypt`）处获得，也可以自行通过OpenSSH生成，可供参考的生成指令如下：
-    ```bash
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
-    ```
+-   **存入证书**: 将从提供商（如`Let's Encrypt`）处获得或自签名的私钥与证书命名为server.*（文件扩展名）后在项目根目录创建 `cert` 文件夹，并将文件放入其中，部署时未检测到私钥与证书会自动通过OpenSSH生成。
 
 2.  **配置Docker Compose文件**:
 -   **自定义（可选）**: 可以按需修改字段（如修改 `SPRING_DATASOURCE_PASSWORD` 来更改访问数据库所使用的密码）或增减将要部署的容器（如注释部署MySQL容器的部分，选择使用自己的数据库容器）
