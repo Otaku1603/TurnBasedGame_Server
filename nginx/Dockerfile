@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:stable-alpine-perl
 
 # 安装 openssl (用于生成证书)
 RUN apk add --no-cache openssl
