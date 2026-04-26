@@ -185,10 +185,10 @@ INSERT INTO `t_character_template` VALUES (3, 'assassin', '流浪刺客', 100, 2
 -- ----------------------------
 DROP TABLE IF EXISTS `t_friend`;
 CREATE TABLE `t_friend`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL,
-  `friend_id` bigint NOT NULL,
-  `status` int NULL DEFAULT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '关系记录ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `friend_id` bigint NOT NULL COMMENT '好友用户ID',
+  `status` int NULL DEFAULT NULL COMMENT '关系状态',
   `created_at` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_friend`(`user_id` ASC, `friend_id` ASC) USING BTREE,
