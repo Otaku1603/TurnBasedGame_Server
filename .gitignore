@@ -85,3 +85,7 @@ HELP.md
 *.p12
 *.jks
 .env*
+
+### application 配置文件 ###
+application.properties
+application.yml

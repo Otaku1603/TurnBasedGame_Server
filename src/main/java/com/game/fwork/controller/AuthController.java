@@ -6,6 +6,7 @@ import com.game.fwork.entity.CharacterTemplate;
 import com.game.fwork.entity.User;
 import com.game.fwork.repository.CharacterRepository;
 import com.game.fwork.repository.CharacterTemplateRepository;
+import com.game.fwork.repository.SkillRepository;
 import com.game.fwork.repository.UserRepository;
 import com.game.fwork.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
     @Autowired private CharacterTemplateRepository characterTemplateRepository;
+    @Autowired private SkillRepository skillRepository;
 
     /**
      * 用户注册
@@ -102,6 +104,18 @@ public class AuthController {
 
             newCharacter.setIsActive(1);
             characterRepository.save(newCharacter);
+
+            // 所有人默认学会基础攻击 "普通攻击"
+            skillRepository.addSkillToCharacter(newCharacter.getId(), 1);
+
+            // 根据选择的职业模板分配特色技能
+            if ("mage".equalsIgnoreCase(template.getCharType())) {
+                // 法师带治疗术
+                skillRepository.addSkillToCharacter(newCharacter.getId(), 3);
+            } else {
+                // 战士和刺客带重击
+                skillRepository.addSkillToCharacter(newCharacter.getId(), 2);
+            }
 
             // 生成JWT Token
             String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getUsername());
